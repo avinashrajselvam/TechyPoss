@@ -11,6 +11,8 @@ interface HeaderProps {
   setCustomerName: (v: string) => void;
   heldOrdersCount: number;
   onShowHeld: () => void;
+  onLogout?: () => void;
+  showLogout?: boolean;
 }
 
 const TABLES = ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'Takeaway', 'Delivery', 'Counter'];
@@ -18,7 +20,8 @@ const TABLES = ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'Ta
 export default function Header({
   tableNumber, setTableNumber,
   customerName, setCustomerName,
-  heldOrdersCount, onShowHeld
+  heldOrdersCount, onShowHeld,
+  onLogout, showLogout
 }: HeaderProps) {
   const [showTablePicker, setShowTablePicker] = useState(false);
   const [time, setTime] = useState(new Date());
@@ -129,20 +132,28 @@ export default function Header({
       </div>
 
       {/* User */}
-      <button className="flex items-center gap-1.5 pl-2 border-l border-slate-700">
-        <div className="w-7 h-7 bg-slate-600 rounded-full flex items-center justify-center">
-          <User size={14} className="text-slate-300" />
-        </div>
-        <div className="hidden lg:block">
-          <div className="text-white text-xs font-medium leading-none">Cashier</div>
-          <div className="text-slate-400 text-[10px]">Admin</div>
-        </div>
-      </button>
-
-      {/* Settings */}
-      <button className="p-1.5 text-slate-400 hover:text-white transition-colors">
-        <Settings size={16} />
-      </button>
+      <div className="flex items-center gap-1.5 pl-2 border-l border-slate-700">
+        <button className="flex items-center gap-1.5">
+          <div className="w-7 h-7 bg-slate-600 rounded-full flex items-center justify-center">
+            <User size={14} className="text-slate-300" />
+          </div>
+          <div className="hidden lg:block">
+            <div className="text-white text-xs font-medium leading-none">Cashier</div>
+            <div className="text-slate-400 text-[10px]">Admin</div>
+          </div>
+        </button>
+        {showLogout && onLogout && (
+          <button
+            onClick={onLogout}
+            className="px-2 py-1 rounded-md bg-slate-800 hover:bg-slate-700 text-[10px] text-slate-200"
+          >
+            Logout
+          </button>
+        )}
+        <button className="p-1.5 text-slate-400 hover:text-white transition-colors">
+          <Settings size={16} />
+        </button>
+      </div>
     </header>
   );
 }
