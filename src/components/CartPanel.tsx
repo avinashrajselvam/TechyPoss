@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import {
   ShoppingCart, Trash2, Plus, Minus, Tag, ChevronDown,
   ChevronUp, Pause, CreditCard, X, AlertCircle
@@ -30,12 +30,8 @@ export default function CartPanel({
   const [showDiscount, setShowDiscount] = useState(false);
   const [discountInput, setDiscountInput] = useState(String(discount));
 
-  useEffect(() => {
-    setDiscountInput(String(discount));
-  }, [discount]);
-
   const applyDiscount = () => {
-    const val = Math.max(0, parseFloat(discountInput) || 0);
+    const val = parseFloat(discountInput) || 0;
     setDiscount(val);
   };
 
@@ -61,11 +57,6 @@ export default function CartPanel({
         </div>
         <div className="flex items-center gap-1">
           <span className="text-slate-500 text-xs bg-slate-800 px-2 py-1 rounded-lg">{tableNumber}</span>
-          {customerName && (
-            <span className="text-slate-500 text-xs bg-slate-800 px-2 py-1 rounded-lg truncate max-w-[90px]">
-              {customerName}
-            </span>
-          )}
           {!isEmpty && (
             <button
               onClick={onClear}

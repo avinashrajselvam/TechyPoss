@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { X, Printer, Share2, CheckCircle2 } from 'lucide-react';
+import { X, Printer, Download, Share2, CheckCircle2 } from 'lucide-react';
 import { CompletedOrder } from '../types';
 
 interface InvoiceModalProps {

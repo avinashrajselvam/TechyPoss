@@ -1,5 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
-import type { Session } from '@supabase/supabase-js';
+import { useMemo } from 'react';
 import { categories, menuItems } from './data/menuData';
 import { usePOSStore } from './store/posStore';
 import Header from './components/Header';
@@ -9,35 +8,9 @@ import CartPanel from './components/CartPanel';
 import PaymentModal from './components/PaymentModal';
 import InvoiceModal from './components/InvoiceModal';
 import HoldOrdersModal from './components/HoldOrdersModal';
-import SupabaseTest from './components/SupabaseTest';
-import LoginPage from './components/LoginPage';
-import ProductsAdmin from './components/ProductsAdmin';
-import { supabase } from './supabaseClient';
 
 export default function App() {
-  const [session, setSession] = useState<Session | null>(null);
-  const [authChecked, setAuthChecked] = useState(false);
-  const [view, setView] = useState<'pos' | 'products'>('pos');
   const store = usePOSStore();
-
-  useEffect(() => {
-    if (!supabase) {
-      setAuthChecked(true);
-      return;
-    }
-    supabase.auth.getSession().then(({ data }: { data: { session: Session | null } }) => {
-      setSession(data.session ?? null);
-      setAuthChecked(true);
-    });
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event: string, newSession: Session | null) => {
-      setSession(newSession);
-    });
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, []);
 
   const filteredItems = useMemo(() => {
     let items = menuItems;
@@ -55,23 +28,6 @@ export default function App() {
     return items;
   }, [store.activeCategory, store.searchQuery]);
 
-  const handleLogout = async () => {
-    if (!supabase) return;
-    await supabase.auth.signOut();
-  };
-
-  if (supabase && !authChecked) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-slate-950 text-white">
-        <div className="text-sm text-slate-300">Checking session…</div>
-      </div>
-    );
-  }
-
-  if (supabase && authChecked && !session) {
-    return <LoginPage />;
-  }
-
   return (
     <div className="flex flex-col h-screen bg-slate-900 text-white overflow-hidden">
       <Header
@@ -81,38 +37,9 @@ export default function App() {
         setCustomerName={store.setCustomerName}
         heldOrdersCount={store.heldOrders.length}
         onShowHeld={() => store.setShowHoldOrders(true)}
-        onLogout={supabase ? handleLogout : undefined}
-        showLogout={!!supabase}
       />
 
-      {/* Top tabs: POS vs Products admin */}
-      <div className="border-b border-slate-800 px-4 py-2 text-xs flex items-center gap-2 bg-slate-950/60">
-        <button
-          type="button"
-          onClick={() => setView('pos')}
-          className={`px-3 py-1.5 rounded-md font-medium ${
-            view === 'pos'
-              ? 'bg-orange-500 text-white'
-              : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
-          }`}
-        >
-          Billing POS
-        </button>
-        <button
-          type="button"
-          onClick={() => setView('products')}
-          className={`px-3 py-1.5 rounded-md font-medium ${
-            view === 'products'
-              ? 'bg-orange-500 text-white'
-              : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
-          }`}
-        >
-          Products (Supabase)
-        </button>
-      </div>
-
-      {view === 'pos' && (
-        <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-hidden">
         {/* Category Sidebar */}
         <CategorySidebar
           categories={categories}
@@ -147,23 +74,12 @@ export default function App() {
             onRemove={store.removeFromCart}
             onClear={store.clearCart}
             onHold={store.holdOrder}
-            onPay={() => {
-              if (store.cart.length > 0) {
-                store.setShowPaymentModal(true);
-              }
-            }}
+            onPay={() => store.setShowPaymentModal(true)}
             setDiscount={store.setDiscount}
             setDiscountType={store.setDiscountType}
           />
         </div>
-        </div>
-      )}
-
-      {view === 'products' && (
-        <div className="flex-1 overflow-hidden">
-          <ProductsAdmin />
-        </div>
-      )}
+      </div>
 
       {/* Modals */}
       {store.showPaymentModal && (
@@ -194,9 +110,6 @@ export default function App() {
           onClose={() => store.setShowHoldOrders(false)}
         />
       )}
-
-      {/* Small widget to verify Supabase connection */}
-      <SupabaseTest />
     </div>
   );
 }

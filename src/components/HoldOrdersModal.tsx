@@ -1,4 +1,4 @@
-import { X, Clock, Play, Trash2, ShoppingBag, User } from 'lucide-react';
+import { X, Clock, Play, Trash2, ShoppingBag, User, Table } from 'lucide-react';
 import { HeldOrder } from '../types';
 import { calculateOrderSummary } from '../store/posStore';
 

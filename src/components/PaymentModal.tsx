@@ -25,8 +25,7 @@ export default function PaymentModal({
   const [splitCard, setSplitCard] = useState('');
 
   const total = orderSummary.total;
-  const cashTenderedNumber = parseFloat(cashTendered) || 0;
-  const cashBack = cashTendered ? Math.max(0, cashTenderedNumber - total) : 0;
+  const cashBack = cashTendered ? Math.max(0, parseFloat(cashTendered) - total) : 0;
 
   const quickAmounts = [
     Math.ceil(total / 10) * 10,
@@ -37,7 +36,6 @@ export default function PaymentModal({
 
   const splitTotal = (parseFloat(splitCash) || 0) + (parseFloat(splitUPI) || 0) + (parseFloat(splitCard) || 0);
   const splitValid = Math.abs(splitTotal - total) < 0.01;
-  const splitRemaining = total - splitTotal;
 
   const handleConfirm = () => {
     if (step === 'cash') {
@@ -182,12 +180,6 @@ export default function PaymentModal({
                     ₹{amt}
                   </button>
                 ))}
-                <button
-                  onClick={() => setCashTendered(total.toFixed(2))}
-                  className="col-span-4 py-2 bg-orange-500/20 hover:bg-orange-500/30 border border-orange-500/40 rounded-lg text-orange-300 text-sm font-medium transition-colors"
-                >
-                  Exact ₹{total.toFixed(2)}
-                </button>
               </div>
               {cashTendered && parseFloat(cashTendered) >= total && (
                 <div className="flex justify-between bg-emerald-500/10 border border-emerald-500/30 rounded-xl px-4 py-3">
@@ -262,9 +254,6 @@ export default function PaymentModal({
                 <span>Allocated</span>
                 <span>₹{splitTotal.toFixed(2)} / ₹{total.toFixed(2)}</span>
               </div>
-              <div className={`text-xs text-right ${splitValid ? 'text-green-400' : 'text-slate-500'}`}>
-                {splitValid ? 'Split is valid' : `Remaining: ₹${Math.max(0, splitRemaining).toFixed(2)}`}
-              </div>
             </div>
           )}
         </div>
@@ -280,7 +269,7 @@ export default function PaymentModal({
             </button>
             <button
               onClick={handleConfirm}
-              disabled={(step === 'cash' && cashTenderedNumber < total) || (step === 'split' && !splitValid)}
+              disabled={(step === 'cash' && parseFloat(cashTendered) < total) || (step === 'split' && !splitValid)}
               className="flex-[2] flex items-center justify-center gap-2 py-3 bg-orange-500 hover:bg-orange-400 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl font-bold text-sm transition-colors shadow-lg shadow-orange-500/30"
             >
               <CheckCircle2 size={16} />
